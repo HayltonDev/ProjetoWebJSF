@@ -19,11 +19,11 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean(name="controlePais")
 @SessionScoped //as classes controles @ManagedBean servem para responder os comandos da interface, ou seja, do usuário
 public class ControlePais implements Serializable{
-    private PaisDAO dao; //esse primeiro serve para interação com o banco de dados
+    private PaisDAO<Pais> dao; //esse primeiro serve para interação com o banco de dados
     private Pais pais; //esse vai servir para receber a instancia que vou estar editando ou inserindo 
 
     public ControlePais() {
-        dao = new PaisDAO(); // no construtor de qualquer classe controle @Managedbean, é bom iniciar no construtor os objetos do tipo DAO
+        dao = new PaisDAO<>(); // no construtor de qualquer classe controle @Managedbean, é bom iniciar no construtor os objetos do tipo DAO
     }
     
     public String listar(){
@@ -36,7 +36,14 @@ public class ControlePais implements Serializable{
     }
     
     public String salvar(){
-        if(dao.salvarPais(pais)){
+        boolean persistiu = false;
+        if(pais.getId() == null){
+            persistiu = dao.persistGenerico(pais);
+        }else{
+            persistiu = dao.mergeGenerico(pais);
+        }
+        
+        if(persistiu){
             Util.mensagemInformacao(dao.getMenssagem());
             return "listar?faces-redirect=true";
         }else{
@@ -50,13 +57,13 @@ public class ControlePais implements Serializable{
     }
     
     public String editar(Integer id){
-        pais = dao.localizarPais(id);
+        pais = dao.localizarGenerico(id);
         return "formulario?faces-redirect-true";
     }
     
     public void remover(Integer id){
-        pais = dao.localizarPais(id);
-        if(dao.removerPais(pais)){
+        pais = dao.localizarGenerico(id);
+        if(dao.removeGenerico(pais)){
             Util.mensagemInformacao(dao.getMenssagem());
         }else{
             Util.mensagemErro(dao.getMenssagem()); 
