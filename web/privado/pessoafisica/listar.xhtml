@@ -74,7 +74,8 @@
             </h:form>
         </ui:define>
         <ui:define name="dialogos">
-            <p:dialog widgetVar="dlg" header="Edição" modal="true"  resizable="false" minimizable="true" draggable="true" maximizable="true" hideEffect="fade" showEffect="slide">
+            <div align="center">
+            <p:dialog widgetVar="dlg" header="Edição" modal="true"  resizable="false" minimizable="true" draggable="true" maximizable="true" hideEffect="fade" showEffect="fade">
                 <h:form id="formEdicao">
                     <p:growl id="growl"/>
                     <p:tabView id="tab">
@@ -182,7 +183,40 @@
                             </p:dataTable>
                         </p:tab>
                         <p:tab title="Desejos">
-                            
+                            <p:dataTable value="#{controlePessoaFisica.pessoaFisica.desejos}" 
+                                         var="dsj" rowIndexVar="idxDsj" id="listaDesejos">
+                                <f:facet name="header">
+                                    <p:panelGrid columns="2">
+                                        <p:selectOneMenu value="#{controlePessoaFisica.produto}"
+                                                         id="selectProduto">
+                                            <f:converter converterId="converterProduto"/>
+                                            <f:selectItem noSelectionOption="true" itemLabel="Selecione um registro"/>
+                                            <f:selectItems value="#{controlePessoaFisica.daoProduto.listaTodosObjetos}" var="prod"
+                                                           itemLabel="#{prod.nome}"/>
+                                        </p:selectOneMenu>
+                                        <p:commandButton value="Adicionar"
+                                                         actionListener="#{controlePessoaFisica.adicionarDesejo()}"
+                                                         update="listaDesejos :formEdicao:growl"
+                                                         id="btnAdicionarDesejo" process="btnAdicionarDesejo selectProduto"
+                                                         icon="ui-icon-plus"/>
+                                    </p:panelGrid>
+                                </f:facet>
+                                <p:column headerText="Nome">
+                                    <p:outputLabel value="#{dsj.nome}"/>
+                                </p:column>
+                                <p:column headerText="Marca">
+                                    <p:outputLabel value="#{dsj.marca.nome}"/>
+                                </p:column>
+                                <p:column headerText="Ações">
+                                    <div align="center">
+                                        <p:commandButton id="btnRemoverDesejo"
+                                                         actionListener="#{controlePessoaFisica.remover(idxDsj)}"
+                                                         process="btnRemoverDesejo" update="listaDesejos :formEdicao:growl"
+                                                         icon="ui-icon-trash"
+                                                         onclick="if(!confirm('Confirma a exclusão do desejo?')) return false"/>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
 
                         </p:tab>
 
@@ -190,7 +224,7 @@
                     <ui:include src="/templates/ajaxstatus.xhtml"/>
                 </h:form>
             </p:dialog>
-
+            </div>
             <p:dialog header="Edição de Endereços" widgetVar="dlgEndereco" resizable="false" modal="true">
                 <h:form id="formEndereco">
                     <p:growl/>
